@@ -22,20 +22,32 @@ export default function RootLayout() {
   )
 }
 
-function AuthGuard({children}: {children: React.ReactNode}) {
-  const {isAuthenticated, isLoading} = useAuth();
-  const segments = useSegments();
-  const router = useRouter();
+// Auth guard component to handle protected routes
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth()
+  const segments = useSegments()
+  const router = useRouter()
 
   useEffect(() => {
-    if(isLoading) return
+    if (isLoading) return
 
-    //check if user is authenticated
-    const inAuthGroup = (segments[0] as string) === "(auth)";
-    const inProtectedGroup = (segments[0] as string) === "(root)";
+    // Check if the user is authenticated
+    const inAuthGroup = segments[0] === "(auth)"
+    const inProtectedGroup = segments[0] === "(root)"
 
-    if(!isAuthenticated && inProtectedGroup) {
-      router.replace("/auth/login");
+    if (!isAuthenticated && inProtectedGroup) {
+      // Redirect to login if trying to access protected routes without auth
+      router.replace("/(auth)/login")
+    } else if (isAuthenticated && inAuthGroup) {
+      // Redirect to home if already authenticated but on auth routes
+      router.replace("/(root)")
     }
-  })
+  }, [isAuthenticated, isLoading, segments, router])
+
+  if (isLoading) {
+    // You could return a loading screen here
+    return null
+  }
+
+  return <>{children}</>
 }

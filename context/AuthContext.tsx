@@ -3,6 +3,7 @@
 import type React from "react"
 import { createContext, useState, useEffect, useContext } from "react"
 import type { Models } from "react-native-appwrite"
+import { ID } from "react-native-appwrite"
 import { useAppwrite } from "./AppwriteContext"
 
 type AuthContextType = {
@@ -56,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (email: string, password: string, name: string) => {
     try {
-      await account.create("unique()", email, password, name)
+      await account.create(ID.unique(), email, password, name)
       await login(email, password)
     } catch (error) {
       throw error
